@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-# Load configuration
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -44,7 +43,7 @@ def cleanup_path(path, threshold_minutes=THRESHOLD_MINUTES):
         for file in files:
             file_path = os.path.join(root, file)
             if is_stale(file_path, threshold_minutes):
-                for _ in range(3):  # Retry up to 3 times
+                for _ in range(3):
                     try:
                         os.remove(file_path)
                         logging.info(f"Deleted stale file: {file_path}")
@@ -63,9 +62,8 @@ def cleanup_path(path, threshold_minutes=THRESHOLD_MINUTES):
                         break
                     except (OSError, Exception) as e:
                         logging.error(f"Error deleting directory {dir_path}: {e}")
-                        time.sleep(5)  # Wait for 5 seconds before retrying
+                        time.sleep(5)
 
-    # Remove any empty directories post cleanup
     remove_empty_dirs(path)
 
 
@@ -85,7 +83,6 @@ def graceful_shutdown(signum, frame):
 scheduler = BackgroundScheduler()
 
 if __name__ == "__main__":
-    # Register signal handlers for graceful shutdown
     signal.signal(signal.SIGINT, graceful_shutdown)
     signal.signal(signal.SIGTERM, graceful_shutdown)
 
